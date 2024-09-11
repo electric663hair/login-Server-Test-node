@@ -22,29 +22,30 @@ app.post("/auth", (req, res) => {
             return console.log('Unable to scan for other Users:\n' + err);
         }
         const username = req.body["username"]
+        const password = req.body["password"];
         const filePath = `./users/${username}.txt`;
 
         console.log(`username: ${username}\nfileName: ${filePath}`)
 
         fs.access(filePath, fs.constants.F_OK, (err) => {
             if (err) {
+
                 console.error("Failed to check for username file, error:\n" + err)
                 res.redirect("/");
             } else {
-
-                const username = req.body["username"];
-                const password = req.body["password"];
                 //console.log(`Username:  ${username}\nPassword: ${password}`);
-                res.send(`<h1>Hi ${username}!</h1>`);
             
                 fs.readFile(`./users/${username}.txt`, 'utf8', (err, data) => {
                     if (err) throw err;
             
                     //console.log(data); //consoles the data in the {username}.txt file.
-                    const lines = data.split('\r\n');
+                    const lines = data.split('\n');
+
                     const rUsername = lines[0];
                     const rPassword = lines[1];
             
+                    console.log(`:${rUsername}: - :${rPassword}:`);
+
                     //console.log(`Actual username: ${rUsername}\nActual password: ${rPassword}`);
                     //console.log(`Inputted username: ${username}\nInputted password: ${password}`);
             
@@ -59,8 +60,10 @@ app.post("/auth", (req, res) => {
                     }
                     if (!logInError) {
                         console.log("Login Complete!")
+                        res.send(`<h1>Hi ${username}!</h1><br><button onClick="window.location.pathname = '/'">Back</button>`);
                     } else {
                         console.log("=====!!!=====\nError during login!\n=====!!!=====")
+                        res.send(`<h1>Error during login!<br>Please chack that you typed your username and password correctly!</h1><br><button onClick=""window.location.pathname = '/'>Back</button>`);
                     }
                 });
             }
@@ -90,7 +93,7 @@ app.post("/reg", (req, res) => {
 
                     fs.writeFile(`./users/${cUsername}.txt`, `${cUsername}\n${cPassword}`, 'utf8', (err) => {if(err)throw err;})
                     console.log("User saved!")
-                    res.send(`<h1>User saved as ${cUsername}!</h1>`)
+                    res.send(`<h1>User saved as ${cUsername}!</h1><br><button onClick="window.location.pathname = '/'">Back</button>`)
 
                 } else {
                     console.log("Passwords does not match!")
@@ -107,6 +110,7 @@ app.post("/reg", (req, res) => {
 
 app.get("/", (req, res) => {
     res.sendFile(__dirname + '/login.html');
+    console.log("Reloaded!")
 });
 
 app.listen(port, () => {

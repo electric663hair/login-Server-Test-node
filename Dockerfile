@@ -1,6 +1,10 @@
-FROM node:20
-WORKDIR /the/workdir/path
-COPY package*.json index.js ./
-RUN npm install
+FROM node:lts-alpine
+ENV NODE_ENV=production
+WORKDIR /usr/src/app
+COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
+RUN npm install --production --silent && mv node_modules ../
+COPY . .
 EXPOSE 3000
-CMD ["nodemon.cmd", "index.js"]
+RUN chown -R node /usr/src/app
+USER node
+CMD ["node", "login.js"]

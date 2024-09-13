@@ -1,6 +1,9 @@
 import express from "express";
 import bodyParser from "body-parser";
 import fs from "fs";
+import { mark } from "./encrypting.js";
+
+mark.encryptData("data");
 
 const app = express();
 const port = 3000;
@@ -21,10 +24,9 @@ app.post("/auth", (req, res) => {
         if (err) {
             return console.log('Unable to scan for other Users:\n' + err);
         }
-        const username = req.body["username"]
+
         const password = req.body["password"];
         const filePath = `./users/${username}.txt`;
-
         console.log(`username: ${username}\nfileName: ${filePath}`)
 
         fs.access(filePath, fs.constants.F_OK, (err) => {
@@ -63,7 +65,7 @@ app.post("/auth", (req, res) => {
                         res.send(`<h1>Hi ${username}!</h1><br><button onClick="window.location.pathname = '/'">Back</button>`);
                     } else {
                         console.log("=====!!!=====\nError during login!\n=====!!!=====")
-                        res.send(`<h1>Error during login!<br>Please chack that you typed your username and password correctly!</h1><br><button onClick=""window.location.pathname = '/'>Back</button>`);
+                        res.send(`<h1>Error during login!<br>Please chack that you typed your username and password correctly!</h1><br><button onClick="window.location.pathname = '/'">Back</button>`);
                     }
                 });
             }
@@ -91,9 +93,16 @@ app.post("/reg", (req, res) => {
                 const cPassword2 = req.body["cPassword2"]
                 if (cPassword === cPassword2) {
 
-                    fs.writeFile(`./users/${cUsername}.txt`, `${cUsername}\n${cPassword}`, 'utf8', (err) => {if(err)throw err;})
-                    console.log("User saved!")
-                    res.send(`<h1>User saved as ${cUsername}!</h1><br><button onClick="window.location.pathname = '/'">Back</button>`)
+
+                    const username = req.body["username"]
+                    if (cUsername.includes("*")) {
+                        console.log("Username can not have a \"*\" in it!")
+                        res.send(`<h1>Username can not have a \"*\" in it!</h1><br><button onClick="window.location.pathname = '/'">Back</button>`)
+                    } else {
+                        fs.writeFile(`./users/${cUsername}.txt`, `${cUsername}\n${cPassword}`, 'utf8', (err) => {if(err)throw err;})
+                            console.log("User saved!")
+                            res.send(`<h1>User saved as ${cUsername}!</h1><br><button onClick="window.location.pathname = '/'">Back</button>`)
+                    }
 
                 } else {
                     console.log("Passwords does not match!")

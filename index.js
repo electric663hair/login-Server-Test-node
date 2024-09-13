@@ -1,9 +1,9 @@
 import express from "express";
 import bodyParser from "body-parser";
 import fs from "fs";
-import { mark } from "./encrypting.js";
+//import { mark } from "./encrypting.js";
 
-mark.encryptData("data");
+//mark.encryptData("data");
 
 const app = express();
 const port = 3000;
@@ -26,6 +26,7 @@ app.post("/auth", (req, res) => {
         }
 
         const password = req.body["password"];
+        const username = req.body["username"]
         const filePath = `./users/${username}.txt`;
         console.log(`username: ${username}\nfileName: ${filePath}`)
 
@@ -33,7 +34,7 @@ app.post("/auth", (req, res) => {
             if (err) {
 
                 console.error("Failed to check for username file, error:\n" + err)
-                res.redirect("/");
+                res.send(`<h1>User not in database</h1><br><button onClick="window.location.pathname = '/'">Back</button>`)
             } else {
                 //console.log(`Username:  ${username}\nPassword: ${password}`);
             
